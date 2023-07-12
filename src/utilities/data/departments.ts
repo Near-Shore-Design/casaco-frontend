@@ -1,0 +1,42 @@
+export const colombiaDepartments: Array<{
+  id: number;
+  value: string;
+  label: string;
+}> = [
+  { id: 1, value: "Amazonas", label: "Amazonas" },
+  { id: 2, value: "Antioquia", label: "Antioquia" },
+  { id: 3, value: "Arauca", label: "Arauca" },
+  { id: 4, value: "Atlántico", label: "Atlántico" },
+  { id: 5, value: "Bolívar", label: "Bolívar" },
+  { id: 6, value: "Boyacá", label: "Boyacá" },
+  { id: 7, value: "Caldas", label: "Caldas" },
+  { id: 8, value: "Caquetá", label: "Caquetá" },
+  { id: 9, value: "Casanare", label: "Casanare" },
+  { id: 10, value: "Cauca", label: "Cauca" },
+  { id: 11, value: "Cesar", label: "Cesar" },
+  { id: 12, value: "Chocó", label: "Chocó" },
+  { id: 13, value: "Córdoba", label: "Córdoba" },
+  { id: 14, value: "Cundinamarca", label: "Cundinamarca" },
+  { id: 15, value: "Guainía", label: "Guainía" },
+  { id: 16, value: "Guaviare", label: "Guaviare" },
+  { id: 17, value: "Huila", label: "Huila" },
+  { id: 18, value: "La Guajira", label: "La Guajira" },
+  { id: 19, value: "Magdalena", label: "Magdalena" },
+  { id: 20, value: "Meta", label: "Meta" },
+  { id: 21, value: "Nariño", label: "Nariño" },
+  { id: 22, value: "Norte de Santander", label: "Norte de Santander" },
+  { id: 23, value: "Putumayo", label: "Putumayo" },
+  { id: 24, value: "Quindío", label: "Quindío" },
+  { id: 25, value: "Risaralda", label: "Risaralda" },
+  {
+    id: 26,
+    value: "San Andrés y Providencia",
+    label: "San Andrés y Providencia",
+  },
+  { id: 27, value: "Santander", label: "Santander" },
+  { id: 28, value: "Sucre", label: "Sucre" },
+  { id: 29, value: "Tolima", label: "Tolima" },
+  { id: 30, value: "Valle del Cauca", label: "Valle del Cauca" },
+  { id: 31, value: "Vaupés", label: "Vaupés" },
+  { id: 32, value: "Vichada", label: "Vichada" },
+];

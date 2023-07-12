@@ -1,0 +1,61 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,600;1,400;1,600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+html,
+body,
+label {
+  font-family: "Roboto", sans-serif;
+}
+body {
+  /* padding: 0 15px; */
+  background-color: #e5e7eb;
+}
+
+.dark {
+  background-color: #1c1a1a;
+  color: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: gray;
+  border-radius: 5px;
+}
+::-webkit-scrollbar {
+  width: 3px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+.toggle-checkbox:checked {
+  @apply: right-0 border-green-400;
+  right: 0;
+  /* border-color: #d3ac2b; */
+}
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+.toggle-checkbox:checked + .toggle-label {
+  @apply: bg-green-400;
+  background-color: #d3ac2b;
+}
+.active {
+  @apply text-[#D3AC2B] font-bold cursor-default text-xl;
+}
+
+.active-mobile {
+  @apply text-[#D3AC2B] border-b border-platinum font-bold py-2 cursor-default;
+}
