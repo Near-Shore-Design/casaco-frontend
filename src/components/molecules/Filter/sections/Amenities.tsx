@@ -1,6 +1,11 @@
-import { useState } from "react";
 import Button from "components/atoms/Button";
-import { useAppDispatch } from "utilities/hooks";
+import { useAppDispatch, useAppSelector } from "utilities/hooks";
+import {
+  updateBedsFilter,
+  updateBathsFilter,
+  updateNoOfBedsSelectedDrpdwnObj,
+  updateNoOfBathsSelectedDrpdwnObj,
+} from "utilities/reduxSlices/buyPropertySlice";
 import Select from "react-select";
 import { filteredProperties } from "utilities/reduxSlices/HomePropertySlice";
 import { bathsFilter, bedsFilter } from "utilities/data/bedBath";
@@ -9,27 +14,31 @@ interface amenitiesModalProp {
   onClick: () => void;
 }
 const Amenities: React.FC<amenitiesModalProp> = ({ onClick }) => {
-  const [beds, setBeds] = useState<null>(null);
-  const [baths, setBaths] = useState<null>(null);
+  const {
+    noOfBedsSelected,
+    noOfBathsSelected,
+    noOfBedsSelectedDrpdwnObj,
+    noOfBathsSelectedDrpdwnObj,
+  } = useAppSelector((state) => state.buy);
 
-  const [bedsValue, setBedsValue] = useState<null>(null);
-  const [bathsValue, setBathsValue] = useState<null>(null);
   const dispatch = useAppDispatch();
 
-  const disableButton = beds === null && baths === null;
+  const disableButton = noOfBedsSelected === null && noOfBathsSelected === null;
 
   const handleBedChange = (selected: any) => {
-    setBedsValue(selected);
-    setBeds(selected.value);
+    dispatch(updateNoOfBedsSelectedDrpdwnObj(selected));
+    dispatch(updateBedsFilter(selected?.value));
   };
   const handleBathChange = (selected: any) => {
-    setBathsValue(selected);
-    setBaths(selected.value);
+    dispatch(updateNoOfBathsSelectedDrpdwnObj(selected));
+    dispatch(updateBathsFilter(selected?.value));
   };
 
   const filterProperties = () => {
     onClick();
-    dispatch(filteredProperties({ baths: baths, beds: beds }));
+    dispatch(
+      filteredProperties({ baths: noOfBathsSelected, beds: noOfBedsSelected })
+    );
   };
 
   return (
@@ -39,7 +48,7 @@ const Amenities: React.FC<amenitiesModalProp> = ({ onClick }) => {
           <p className="py-3 ">Number of beds</p>
           <Select
             placeholder="No. of beds"
-            value={bedsValue}
+            value={noOfBedsSelectedDrpdwnObj}
             options={bedsFilter}
             onChange={handleBedChange}
           />
@@ -49,7 +58,7 @@ const Amenities: React.FC<amenitiesModalProp> = ({ onClick }) => {
           <Select
             placeholder="No. of beds"
             options={bathsFilter}
-            value={bathsValue}
+            value={noOfBathsSelectedDrpdwnObj}
             onChange={handleBathChange}
           />
         </div>

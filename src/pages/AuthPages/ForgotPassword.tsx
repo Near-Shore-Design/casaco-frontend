@@ -35,9 +35,9 @@ const ForgotPassword = () => {
     };
     dispatch(userForgotPassword(dataField)).then((data) => {
       if (data.payload === "Email sent successfully") {
-        toast.success("Password Reset instructions sent successfully");
+        toast.success("Password reset instructions sent successfully");
       } else {
-        toast.error("User not found");
+        toast.error("User not found!");
       }
     });
     reset();

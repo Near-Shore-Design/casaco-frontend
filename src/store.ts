@@ -15,6 +15,9 @@ import storage from "redux-persist/lib/storage";
 import authReducer from "utilities/reduxSlices/authSlice";
 import homeReducer from "utilities/reduxSlices/HomePropertySlice";
 import mapReducer from "utilities/reduxSlices/MapSlice";
+import sellPropertyReducer from "utilities/reduxSlices/sellPropertySlice";
+import buyPropertyReducer from "utilities/reduxSlices/buyPropertySlice";
+
 const persistConfig = {
   key: "root",
   version: 1,
@@ -25,6 +28,8 @@ const rootReducer = combineReducers({
   auth: authReducer,
   home: homeReducer,
   map: mapReducer,
+  sell: sellPropertyReducer,
+  buy: buyPropertyReducer,
 });
 
 export const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -39,8 +44,10 @@ const store = configureStore({
     }),
 });
 injectStore(store);
-export const persistor = persistStore(store);
-export default store;
+
+const persistor = persistStore(store);
+
+export { store, persistor };
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

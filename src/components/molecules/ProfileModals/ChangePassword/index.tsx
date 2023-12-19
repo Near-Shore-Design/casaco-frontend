@@ -30,7 +30,7 @@ const ChangePasswordModalComponent: React.FC<changePasswordProp> = ({
   const onSubmit = (data: Inputs) => {
     dispatch(passwordChange(data)).then((data: any) => {
       if (data?.payload === "Request failed with status code 400") {
-        toast.error("Old password incorrect");
+        toast.error("Old password incorrect!");
       } else {
         onClose();
       }

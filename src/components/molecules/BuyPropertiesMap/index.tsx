@@ -5,6 +5,9 @@ import { InfoWindowF, MarkerF, PolygonF } from "@react-google-maps/api";
 import { useEffect, useRef, useState } from "react";
 import { clearPolygonCoordinates } from "utilities/reduxSlices/MapSlice";
 import axios from "axios";
+import Modal from "../Modal";
+import SingleHouseModalComponent from "../SingeleHouseMModalCommponent";
+import { getSingleProperty } from "utilities/reduxSlices/HomePropertySlice";
 
 const BuyPropertiesMap = () => {
   const { buyProperties } = useAppSelector((state: RootState) => state.home);
@@ -12,6 +15,7 @@ const BuyPropertiesMap = () => {
     (state: RootState) => state.map
   );
   const [geoJSONData, setGeoJSONData] = useState<Array<any>>([]);
+  const [openModal, setOpenModal] = useState<boolean>(false);
   const listener = useRef(true);
 
   useEffect(() => {
@@ -66,13 +70,22 @@ const BuyPropertiesMap = () => {
 
   const dispatch = useAppDispatch();
 
+  const openPropertyModal = (id: number) => {
+    dispatch(getSingleProperty(id)).then(() => {
+      setOpenModal(true);
+    });
+  };
   return (
     <div className="block w-full lg:w-[50%] h-full relative">
       <Map onLoad={onLoad} center={centerMap}>
         {buyProperties?.map(
-          ({ latitude, longitude, location, images, price }, idx) => (
+          (
+            { latitude, longitude, location, images, price, property_id },
+            idx
+          ) => (
             <MarkerF
               key={idx}
+              onClick={() => openPropertyModal(property_id)}
               position={{ lat: Number(latitude), lng: Number(longitude) }}
               onMouseOver={() => handleMarkerHover(idx)}
               onMouseOut={() => handleMarkerHover(null)}
@@ -80,9 +93,9 @@ const BuyPropertiesMap = () => {
               {hoveredMarker === idx && (
                 <InfoWindowF>
                   <div className="w-[100px]">
-                    <div className="flex">
-                      {location}
-                      {Number(price).toLocaleString()}
+                    <div>
+                      <p>{`City: ${location}`}</p>
+                      <p>{`Price: ${Number(price).toLocaleString("es-CO")}`}</p>
                     </div>
                     <img src={images?.[0]} alt="" className="w-full h-full" />
                   </div>
@@ -109,6 +122,15 @@ const BuyPropertiesMap = () => {
           </>
         )}
       </Map>
+
+      <Modal
+        className="w-full"
+        isShown={openModal}
+        hide={() => setOpenModal(false)}
+        header="Property"
+      >
+        <SingleHouseModalComponent />
+      </Modal>
     </div>
   );
 };

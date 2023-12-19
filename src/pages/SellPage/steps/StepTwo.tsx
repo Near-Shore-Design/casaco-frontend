@@ -1,5 +1,7 @@
+import { useState } from "react";
 import ErrorMessage from "components/atoms/ErrorMessage";
 import InputField from "components/atoms/InputField";
+import StatefulInputField from "components/atoms/InputField/StatefulInputField";
 import SelectDropdown from "components/molecules/SelectDropDown";
 import React from "react";
 import { Controller, UseFormRegister } from "react-hook-form";
@@ -28,6 +30,9 @@ interface stepTwoProp {
   exteriorChange: boolean;
   errorState: boolean;
   handleExteriorChange: (x: any) => void;
+  price: string;
+  handlePriceChange: (x: any) => void;
+  priceValidationMsg: any;
 }
 const StepTwo: React.FC<stepTwoProp> = ({
   register,
@@ -46,18 +51,46 @@ const StepTwo: React.FC<stepTwoProp> = ({
   exteriorChange,
   errorState,
   handleExteriorChange,
+  price,
+  handlePriceChange,
+  priceValidationMsg,
 }) => {
+  // const [price, setPrice] = useState("");
+  // const [numericPrice, setNumericPrice] = useState<number>(0);
+  // const [hasPriceBeenAdded, setHasPriceBeenAdded] = useState<boolean>(false);
+
+  // const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const val = e?.target?.value;
+  //   const numericValue = val.replace(/[^0-9]/g, "").replace(",", ".");
+  //   const formattedValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  //   const stringWithoutDots = formattedValue.replace(/\./g, "");
+  //   const numberValue = parseFloat(stringWithoutDots);
+  //   setPrice(formattedValue);
+  //   setNumericPrice(numberValue);
+  //   if (!hasPriceBeenAdded) {
+  //     setHasPriceBeenAdded(true);
+  //   }
+  // };
+
+  // const priceValiationMsg =
+  //   hasPriceBeenAdded && (numericPrice < 1 || isNaN(numericPrice))
+  //     ? "Minimum property amount should be 1 Colombian pesos"
+  //     : numericPrice >= 50000000000 &&
+  //       "Maximum property amount can be 50.000.000.000 Colombian pesos";
+
   return (
     <div>
       <div className="flex flex-wrap lg:flex-nowrap gap-2 py-7">
-        <InputField
+        <StatefulInputField
           label="Price (COP)"
           name="price"
           id="price"
-          type="number"
-          register={register}
-          containerStyles="w-full "
-          error={errors.price?.message}
+          type="text"
+          containerStyles="w-full"
+          disabled={false}
+          value={price}
+          onChange={handlePriceChange}
+          error={priceValidationMsg}
         />
         <div className="w-full">
           <label className="block mb-1.5 mt-5 text-sm font-semibold text-gray-600 ">

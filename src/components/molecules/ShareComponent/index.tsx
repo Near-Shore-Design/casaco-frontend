@@ -31,15 +31,15 @@ const SocialShareComponent: React.FC<socialShareProp> = ({
       navigator.clipboard
         .writeText(textRef.current.value)
         .then(() => {
-          toast.success("copied to clipboard");
+          toast.success("copied to clipboard!");
         })
         .catch((error) => {
-          toast.error("an error occured");
+          toast.error("an error occured!");
         });
     }
   };
 
-  const shareUrl = `https://casa-colombia.vercel.app/buy-house?property_id=${id}`;
+  const shareUrl = `https://casa-colombia-two.vercel.app/buy-house?property_id=${id}`;
   const subTitle = "Check out this cool website!";
   return (
     <div className="h-fit py-5 w-full max-w-[450px] cursor-default">

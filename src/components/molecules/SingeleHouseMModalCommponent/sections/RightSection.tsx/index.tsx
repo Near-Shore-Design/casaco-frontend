@@ -9,7 +9,19 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "utilities/hooks";
 import { RootState } from "store";
 import NotAuthenticatedForm from "components/molecules/NotAuthenticatedForm";
-import { scheduledTourDate } from "utilities/reduxSlices/HomePropertySlice";
+import {
+  addToFavorite,
+  getAllProperties,
+  getNotAuthenticatedPropertyId,
+  scheduledTourDate,
+  getAllFavoriteProperties,
+} from "utilities/reduxSlices/HomePropertySlice";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { CiExport } from "react-icons/ci";
+import { toast } from "react-hot-toast";
+import FavoriteNotAuthenticated from "components/molecules/FavoriteNotAuthenticatedForm";
+import SocialShareComponent from "components/molecules/ShareComponent";
+import { Tooltip } from "react-tooltip";
 
 interface rightsectionProp {
   header: string | undefined;
@@ -20,8 +32,10 @@ interface rightsectionProp {
   status: string | undefined;
   interior_size: string;
   exterior_size: number;
+  favourites?: boolean;
   features: string[];
   value: number;
+  src: string;
   property_id: number;
 }
 const RightSection: React.FC<rightsectionProp> = ({
@@ -33,14 +47,18 @@ const RightSection: React.FC<rightsectionProp> = ({
   status,
   interior_size,
   features,
+  src,
+  favourites,
   exterior_size,
   property_id,
   value,
 }) => {
-  const { token } = useAppSelector((state: RootState) => state.auth);
+  const { token, userData } = useAppSelector((state: RootState) => state.auth);
   const dispatch = useAppDispatch();
   const [openTourForm, setOpenTourForm] = useState<boolean>(false);
   const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
+  const [showShareContent, setShowShareContent] = useState<boolean>(false);
+  const [showForm, setShowForm] = useState<boolean>(false);
 
   const singlePropertyTab = [
     {
@@ -70,8 +88,69 @@ const RightSection: React.FC<rightsectionProp> = ({
       setOpenTourForm(true);
     }
   };
+
+  const addToFavouriteList = (id: number) => {
+    const data = {
+      user_id: userData?.user_id,
+      property_id: id,
+    };
+    const userID = data?.user_id;
+    const propertyID = data?.property_id;
+    if (!token.access_token) {
+      setShowForm(true);
+      dispatch(getNotAuthenticatedPropertyId(id));
+    } else {
+      dispatch(addToFavorite(data)).then(() => {
+        let favProperties: any[];
+        dispatch(getAllFavoriteProperties(userID)).then((data: any) => {
+          favProperties = data?.payload;
+          favProperties?.some(
+            (favProperty: any) => favProperty?.property_id === propertyID
+          )
+            ? toast.success("Added to favorites!")
+            : toast.success("Removed from favorites!");
+          dispatch(getAllProperties());
+        });
+      });
+    }
+  };
+
+  const hideForm = () => {
+    setShowForm(false);
+  };
+
   return (
     <div className="w-full lg:w-[40%]">
+      <div
+        onClick={(e: any) => e.stopPropagation()}
+        className="flex justify-end gap-4 mr-7 py-4"
+      >
+        <CiExport
+          data-tooltip-id="share"
+          data-tooltip-content="Share"
+          onClick={() => setShowShareContent(true)}
+          size={22}
+        />
+        <div onClick={() => addToFavouriteList(property_id)}>
+          {!favourites && (
+            <AiOutlineHeart
+              data-tooltip-id="add-to-fav"
+              data-tooltip-content="Add to fav"
+              color="#fc0317"
+              size={22}
+            />
+          )}
+
+          {favourites && (
+            <AiFillHeart
+              data-tooltip-id="remove-from-fav"
+              data-tooltip-content="Remove from fav"
+              color="#fc0317"
+              size={22}
+            />
+          )}
+        </div>
+      </div>
       <div className="flex items-center mt-4">
         <h1 className="text-3xl font-semibold">{`COP ${price?.toLocaleString(
           "es-CO"
@@ -127,6 +206,30 @@ const RightSection: React.FC<rightsectionProp> = ({
       >
         <TourForm closeForm={() => setOpenTourForm(false)} />
       </Modal>
+      <Modal
+        className="h-fit"
+        header="Sign in or register to save home"
+        isShown={showForm}
+        hide={hideForm}
+      >
+        <FavoriteNotAuthenticated onClose={() => setShowForm(false)} />
+      </Modal>
+      <Modal
+        className="h-fit"
+        header="Share Property"
+        isShown={showShareContent}
+        hide={() => setShowShareContent(false)}
+      >
+        <SocialShareComponent
+          description={description}
+          title={header}
+          id={property_id}
+          src={src}
+        />
+      </Modal>
+      <Tooltip id="add-to-fav" />
+      <Tooltip id="remove-from-fav" />
+      <Tooltip id="share" />
     </div>
   );
 };

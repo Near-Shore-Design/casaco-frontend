@@ -14,11 +14,11 @@ const PropertySize: React.FC<propertySizeProp> = ({ onClick }) => {
   const interiorRange = findHighestAndLowest(buyProperties, "interior_size");
   const exteriorRange = findHighestAndLowest(buyProperties, "exterior_size");
   const dispath = useAppDispatch();
-  const [minValueInterior, set_minValueInterior] = useState<any>(1);
+  const [minValueInterior, set_minValueInterior] = useState<any>(11);
   const [maxValueInterior, set_maxValueInterior] = useState<any>(
     interiorRange?.highest
   );
-  const [minValueExterior, set_minValueExterior] = useState<any>(1);
+  const [minValueExterior, set_minValueExterior] = useState<any>(0);
   const [maxValueExterior, set_maxValueExterior] = useState<any>(
     exteriorRange?.highest
   );
@@ -50,7 +50,7 @@ const PropertySize: React.FC<propertySizeProp> = ({ onClick }) => {
           <MultiRangeSlider
             style={{ boxShadow: "none", border: "none" }}
             ruler={false}
-            min={1}
+            min={11}
             max={interiorRange?.highest}
             step={1}
             barInnerColor="#D3AC2B"
@@ -73,7 +73,7 @@ const PropertySize: React.FC<propertySizeProp> = ({ onClick }) => {
         <MultiRangeSlider
           style={{ boxShadow: "none", border: "none" }}
           ruler={false}
-          min={1}
+          min={0}
           max={exteriorRange?.highest}
           step={5}
           barInnerColor="#D3AC2B"

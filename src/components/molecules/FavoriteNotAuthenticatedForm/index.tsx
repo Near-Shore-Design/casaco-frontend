@@ -1,3 +1,4 @@
+import { useState } from "react";
 import InputField from "components/atoms/InputField";
 import { useForm } from "react-hook-form";
 import { authSchema } from "utilities/Schema/authSchema";
@@ -7,13 +8,14 @@ import { useAppDispatch, useAppSelector } from "utilities/hooks";
 import { userLogin } from "utilities/reduxSlices/authSlice";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import GoogleSigninWithoutRedirect from "../GoogleSigninWithoutRedirect";
 import { RootState } from "store";
 import { PacmanLoader } from "react-spinners";
 import {
   addToFavorite,
   getAllProperties,
+  getAllFavoriteProperties,
 } from "utilities/reduxSlices/HomePropertySlice";
+import FavoriteGoogleSignIn from "../AddToFavGoogleSign-in";
 
 type Inputs = {
   email: string;
@@ -41,15 +43,38 @@ const FavoriteNotAuthenticated: React.FC<notAuthenticatedForm> = ({
     mode: "onChange",
     resolver: yupResolver(authSchema),
   });
+
+  const propertyAlreadyExistsFn = () => {
+    toast("Property already exists in favourites!");
+    dispatch(getAllProperties());
+  };
+
+  const propertyDoesNotExistFn = (userID: number) => {
+    dispatch(
+      addToFavorite({
+        user_id: userID,
+        property_id: propertyFavoriteID,
+      })
+    ).then(() => {
+      dispatch(getAllFavoriteProperties(userID));
+      dispatch(getAllProperties());
+      toast.success("Added to favorites!");
+    });
+  };
+
   const onSubmit = (data: Inputs) => {
     dispatch(userLogin(data)).then((data: any) => {
-      if (data?.payload) {
+      if (data?.payload.access_token) {
         const userID = data?.payload?.user?.user_id;
-        dispatch(
-          addToFavorite({ user_id: userID, property_id: propertyFavoriteID })
-        ).then(() => {
-          dispatch(getAllProperties());
-          toast.success("Added to favorites");
+        let favProperties: any[];
+        dispatch(getAllFavoriteProperties(userID)).then((data: any) => {
+          favProperties = data?.payload;
+          favProperties?.some(
+            (favProperty: any) =>
+              favProperty?.property_id === propertyFavoriteID
+          )
+            ? propertyAlreadyExistsFn()
+            : propertyDoesNotExistFn(userID);
         });
       } else {
         return;
@@ -102,10 +127,7 @@ const FavoriteNotAuthenticated: React.FC<notAuthenticatedForm> = ({
       <div className="w-full h-[1px] border-black/25 border my-4" />
       <p className=" text-center"> Or connect with :</p>
       <div className="flex justify-center gap-4 my-2">
-        <GoogleSigninWithoutRedirect
-          id={propertyFavoriteID}
-          onClose={onClose}
-        />
+        <FavoriteGoogleSignIn id={propertyFavoriteID} onClose={onClose} />
       </div>
     </div>
   );

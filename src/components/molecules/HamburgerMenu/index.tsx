@@ -8,6 +8,7 @@ import Switch from "components/atoms/Switch";
 import { useState } from "react";
 import { userLogout } from "utilities/reduxSlices/authSlice";
 import { useAppDispatch, useAppSelector } from "utilities/hooks";
+import { persistor } from "store";
 
 const HamburgerMenu: React.FC<hamburgerProp> = ({
   isLoggedIn,
@@ -34,6 +35,7 @@ const HamburgerMenu: React.FC<hamburgerProp> = ({
     dispatch(userLogout(logoutData)).then(() => {
       closeMenu();
     });
+    persistor.purge();
     navigate("/login");
   };
 

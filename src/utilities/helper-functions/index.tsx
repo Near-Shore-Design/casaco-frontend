@@ -105,16 +105,16 @@ export function nameAbbr(str: string) {
 
 export function generateTimeList() {
   const times = [];
-  let hour = 0;
+  let hour = 8;
   let minute = 0;
 
-  while (hour < 24) {
+  while (hour < 18 || (hour === 18 && minute === 0)) {
     let timeString = `${String(hour).padStart(2, "0")}:${String(
       minute
     ).padStart(2, "0")}`;
     times.push({ label: timeString, value: timeString });
     minute += 30;
-    if (minute >= 60) {
+    if (minute > 30) {
       minute = 0;
       hour++;
     }
@@ -122,7 +122,6 @@ export function generateTimeList() {
 
   return times;
 }
-
 export function removeDuplicates(array: Array<any>) {
   const uniqueValues = new Set();
   return array.filter((obj) => {

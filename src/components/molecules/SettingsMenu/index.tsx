@@ -4,6 +4,7 @@ import { SettingsMenuProp } from "./types";
 import { userLogout } from "utilities/reduxSlices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "utilities/hooks";
+import { persistor } from "store";
 
 const SettingsMenu: React.FC<SettingsMenuProp> = ({
   showSettings,
@@ -19,6 +20,8 @@ const SettingsMenu: React.FC<SettingsMenuProp> = ({
     const logoutData = { refresh: token.refresh_token };
     closeMenu();
     dispatch(userLogout(logoutData));
+    persistor.purge();
+    navigate("/login");
   };
 
   const goToUserSettings = () => {

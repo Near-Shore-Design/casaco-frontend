@@ -36,6 +36,8 @@ const FilterByProp = () => {
     setMoreFilter(true);
   };
 
+  console.log(menuPortalTargetRef, "MENU PORTAL TARGET REF");
+
   return (
     <>
       <div className="relative flex items-end gap-1 ">

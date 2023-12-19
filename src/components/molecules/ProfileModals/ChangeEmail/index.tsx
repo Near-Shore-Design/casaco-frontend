@@ -30,7 +30,7 @@ const ChangeEmailModalComponent: React.FC<changeEmailProp> = ({ onClose }) => {
     dispatch(userDataUpdate({ body: data, id: userData.user_id })).then(
       (data: any) => {
         if (data?.payload === "Request failed with status code 400") {
-          toast.error("New email already exist");
+          toast.error("New email already exist!");
         } else {
           onClose();
         }

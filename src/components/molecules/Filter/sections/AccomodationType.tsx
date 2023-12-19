@@ -1,40 +1,47 @@
 import Button from "components/atoms/Button";
 import { useState } from "react";
 import { accommodationType } from "utilities/data/accomodation";
-import { useAppDispatch } from "utilities/hooks";
+import { useAppDispatch, useAppSelector } from "utilities/hooks";
+import {
+  addToHomeType,
+  removeFromHomeType,
+} from "utilities/reduxSlices/buyPropertySlice";
 import { filteredProperties } from "utilities/reduxSlices/HomePropertySlice";
 
 interface acommodationTypeProp {
   onClick: () => void;
 }
 const AccomodationType: React.FC<acommodationTypeProp> = ({ onClick }) => {
-  const dispath = useAppDispatch();
+  const dispatch = useAppDispatch();
+
+  const { homeType } = useAppSelector((state) => state.buy);
+
   const [expand, setExpand] = useState<boolean>(false);
-  const [accomodation, setAccomodation] = useState<string[]>([]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked;
     const isCheckedValue = e.target.value;
     if (isChecked) {
-      setAccomodation([...accomodation, isCheckedValue]);
+      dispatch(addToHomeType(isCheckedValue));
     } else {
-      const newAccomodation = accomodation.filter(
-        (check) => check !== isCheckedValue
-      );
-      setAccomodation(newAccomodation);
+      dispatch(removeFromHomeType(isCheckedValue));
     }
   };
 
-  const param = `${accomodation.join(",")}`;
+  const filteredHomeType = homeType?.filter((_, index) => index !== 0);
+
+  const param = `${filteredHomeType?.join(",")}`;
 
   const filterHomeTypeProperty = () => {
     onClick();
-    dispath(filteredProperties({ types__in: param }));
+    dispatch(filteredProperties({ types__in: param }));
   };
+
   const itemsToShow = expand
     ? accommodationType
     : accommodationType.slice(0, 9);
 
-  const disableButton = accomodation.length === 0;
+  const disableButton = homeType?.length === 0;
+
   return (
     <>
       <div className="pb-5 mt-4 w-full lg:w-[450px]">
@@ -49,6 +56,7 @@ const AccomodationType: React.FC<acommodationTypeProp> = ({ onClick }) => {
                 type="checkbox"
                 value={label}
                 className="form-checkbox rounded h-5 w-5 text-gray-600"
+                checked={homeType?.includes(label) ? true : false}
                 onChange={handleChange}
               />
               <span className="ml-2 text-sm md:text-xl text-gray-700">
@@ -57,12 +65,6 @@ const AccomodationType: React.FC<acommodationTypeProp> = ({ onClick }) => {
             </label>
           ))}
         </div>
-        {/* <p
-          onClick={() => setExpand((prev) => !prev)}
-          className="mt-3 font-bold text-violet-blue cursor-pointer hover:bg-platinum p-2 w-fit rounded"
-        >
-          {expand ? "Show less" : "Show more"}
-        </p> */}
       </div>
       <div className="flex justify-end border-t border-gray-400 mt-3 py-3">
         <div className="flex gap-3">

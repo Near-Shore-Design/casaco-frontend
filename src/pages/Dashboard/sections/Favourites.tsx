@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Card from "components/molecules/PropertyInfoCard";
 import Modal from "components/molecules/Modal";
 import SingleHouseModalComponent from "components/molecules/SingeleHouseMModalCommponent";
@@ -22,6 +23,10 @@ const Favourites = () => {
   const hideProperty = () => {
     setShow(false);
   };
+
+  useEffect(() => {
+    hideProperty();
+  }, [favProperties]);
   return (
     <div>
       <div className=" ">
@@ -31,7 +36,7 @@ const Favourites = () => {
           hide={hideProperty}
           className="w-full"
         >
-          <SingleHouseModalComponent />
+          <SingleHouseModalComponent favourites={true} />
         </Modal>
         {favProperties && favProperties.length <= 0 && <FavouriteEmptyState />}
         {!favProperties && <FavouriteEmptyState />}
@@ -63,7 +68,7 @@ const Favourites = () => {
               onClick={() => navigate("/buy-house")}
               className="flex text-center w-fit justify-center items-center gap-3 cursor-pointer hover:text-violet-blue"
             >
-              Add more to your favorite list
+              Add more to your favorites list
               <span>
                 <AiOutlineArrowRight />
               </span>

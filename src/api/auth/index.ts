@@ -8,6 +8,7 @@ export const loginUser = async (body: { email: string; password: string }) => {
       url: "users/login",
       data: body,
     });
+    toast.success("Logged in sucessfully!");
     return response.data;
   } catch (error: any) {
     toast.error(error.response.data.detail);
@@ -80,7 +81,7 @@ export const changeProfileInfo = async ({
       url: `/users/${id}/`,
       data: body,
     });
-    toast.success("Profile Updated sucessfully");
+    toast.success("Profile Updated sucessfully!");
     return response.data;
   } catch (error: any) {
     return error.message;

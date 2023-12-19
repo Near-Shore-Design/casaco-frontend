@@ -43,7 +43,7 @@ const Registration = () => {
     dispatch(userRegister(data)).then((data) => {
       const checkValidation = data?.payload?.message;
       if (checkValidation) {
-        toast.success("Registration Successful");
+        toast.success("Registration Successful!");
         dispatch(userLogin({ email, password })).then((data: any) => {
           if (data?.payload) {
             navigate("/dashboard");

@@ -54,7 +54,7 @@ const ResetPassword = () => {
       userResetPassword({ body: resetData, uid: params[0], token: params[1] })
     ).then((data) => {
       if (data.payload === "Password Updated") {
-        toast.success("Password updated");
+        toast.success("Password updated!");
         navigate("/login");
       } else {
         toast.error(data.payload);
@@ -102,10 +102,10 @@ const ResetPassword = () => {
             <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
               <form onSubmit={handleSubmit(onSubmit)} className="px-5 py-7">
                 <h1 className="py-4 text-2xl font-bold text-center text-gray-700">
-                  Create a new Password
+                  Create a new password
                 </h1>
                 <p>
-                  Your new Password should be different from the old password
+                  Your new password should be different from the old password
                   used.{" "}
                 </p>
                 <InputField

@@ -87,6 +87,8 @@ const BuyPage = () => {
     return () => window.removeEventListener("scroll", changeNavbar);
   });
 
+  console.log(price, "price");
+
   return (
     <div className="relative lg:pt-[4.75rem]">
       <div className="hidden md:flex fixed w-full bg-charcoal flex-wrap items-end justify-between py-4 px-3 border-t border-gray-500 z-[1]">

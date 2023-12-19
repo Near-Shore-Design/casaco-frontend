@@ -34,12 +34,11 @@ const NotAuthenticatedForm: React.FC<notAuthenticatedForm> = ({ onClose }) => {
   });
   const onSubmit = (data: Inputs) => {
     dispatch(userLogin(data)).then((data: any) => {
-      if (data?.payload) {
-        toast.success("You are now logged in ");
-      } else {
+      if (data?.payload.message) {
         return;
+      } else {
+        onClose();
       }
-      onClose();
     });
   };
 

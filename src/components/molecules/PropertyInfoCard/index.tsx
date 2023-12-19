@@ -27,7 +27,7 @@ const PropertyInfoCard: React.FC<Cardprops> = ({
     };
     dispatch(removeFromFavorite(data)).then(() => {
       dispatch(getAllFavoriteProperties(user_id));
-      toast("Removed From favorites");
+      toast.success("Removed From favorites!");
     });
   };
   return (
@@ -73,7 +73,7 @@ const PropertyInfoCard: React.FC<Cardprops> = ({
             onClick={() => removeFav(id)}
             className="text-light-red text-right m-0 p-0 cursor-pointer"
           >
-            Remove from favorite
+            Remove from favorites
           </p>
         </div>
       </div>

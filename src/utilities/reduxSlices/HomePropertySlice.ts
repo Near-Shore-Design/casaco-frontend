@@ -13,6 +13,7 @@ import {
   updatePropertyForSale,
 } from "api/properties";
 import { removeDuplicates } from "utilities/helper-functions";
+import { PURGE } from "redux-persist";
 
 interface property {
   images: Array<string>;
@@ -195,7 +196,6 @@ export const homeProperty = createSlice({
     builder.addCase(filteredProperties.pending, (state) => {
       state.isLoading = true;
     });
-
     builder.addCase(filteredProperties.fulfilled, (state, action) => {
       state.buyProperties = action.payload;
       state.isLoading = false;
@@ -245,6 +245,9 @@ export const homeProperty = createSlice({
     });
     builder.addCase(propertyForSale.fulfilled, (state) => {
       state.isLoading = false;
+    });
+    builder.addCase(PURGE, (state) => {
+      return initialState;
     });
   },
 });

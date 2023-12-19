@@ -162,10 +162,10 @@ export const tourRequest = async (data: {
       url: "tours/request-tour",
       data: data,
     });
-    toast.success("Tour request scheduled");
+    toast.success("Tour request scheduled!");
     return response.data.results;
   } catch (error: any) {
-    toast.error("Add a message");
+    toast.error("Add a message!");
   }
 };
 export const tourBookedCheck = async (property_id?: number) => {
@@ -188,7 +188,7 @@ export const listProperty = async (data: any) => {
       data: data,
     });
     if (response) {
-      toast.success("Property sucessfully listed");
+      toast.success("Property sucessfully listed!");
     }
     return response.data.results;
   } catch (error: any) {
@@ -210,7 +210,7 @@ export const updatePropertyForSale = async ({
       data: data,
     });
     if (response) {
-      toast.success("Property sucessfully posted for sale");
+      toast.success("Property sucessfully posted for sale!");
     }
     return response.data.results;
   } catch (error: any) {
@@ -226,7 +226,7 @@ export const sellProperty = async (data: any) => {
       data: data,
     });
     if (response) {
-      toast.success("Property sucessfully posted for sale");
+      toast.success("Property sucessfully posted for sale!");
     }
     return response.data.results;
   } catch (error: any) {

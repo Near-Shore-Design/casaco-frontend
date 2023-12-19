@@ -25,6 +25,8 @@ import { FaExchangeAlt } from "react-icons/fa";
 import { PacmanLoader } from "react-spinners";
 import { ExcemptEInput } from "utilities/helper-functions";
 
+import axios from "axios";
+
 type Inputs = {
   title: string;
   address: string;
@@ -123,17 +125,21 @@ const PropertyListingForm: React.FC<listFormProp> = ({ onClose }) => {
     const value = e.target.value;
     setExteriorValue(value);
 
-    if (exteriorChange && value < 10) {
+    if (exteriorChange && value < 1) {
       setErrorState(true);
-      setErrorMessage("Value must be more than 10");
+      setErrorMessage("Minimum value should be 1");
     }
-    if (exteriorChange && value > 2000) {
+    if (!exteriorChange && value < 0.0001) {
       setErrorState(true);
-      setErrorMessage("Maximum value is 2,000");
+      setErrorMessage("Minimum value should be 0.0001");
     }
-    if (!exteriorChange && value > 100000) {
+    if (exteriorChange && value > 100000) {
       setErrorState(true);
       setErrorMessage("Maximum value is 100,000");
+    }
+    if (!exteriorChange && value > 10) {
+      setErrorState(true);
+      setErrorMessage("Maximum value is 10");
     }
     if (!exteriorChange && !value) {
       setErrorState(true);
@@ -169,7 +175,63 @@ const PropertyListingForm: React.FC<listFormProp> = ({ onClose }) => {
     }
   };
 
+  // const onSubmit = (data: Inputs) => {
+  //   if (exteriorChange && exteriorValue > 2000) {
+  //     setErrorState(true);
+  //     setErrorMessage("Maximum value is 2,000");
+  //     return;
+  //   }
+  //   if (bedsValue === null || bathsValue === null) {
+  //     setBathBathErrorState(true);
+  //     setErrorMessage("Bed and bath cannot be empty");
+  //     return;
+  //   }
+
+  //   if (imageFile !== "") {
+  //     setIsLoading(true);
+  //     const formData = new FormData();
+
+  //     // formData.append("user_id", String(userData.user_id));
+  //     formData.append("title", data.address);
+  //     formData.append("description", String(data.description));
+  //     formData.append("beds", String(beds));
+  //     formData.append("baths", String(baths));
+  //     formData.append("types", data.apartment);
+  //     formData.append("property_status", "idle");
+  //     formData.append("price", String(20000));
+  //     formData.append("location", getCity);
+  //     formData.append("feature", "None");
+  //     formData.append("latitude", String(formattedLat));
+  //     formData.append("longitude", String(formattedlng));
+  //     formData.append("exterior_size", String(exteriorValue));
+  //     formData.append("interior_size", String(data.interior));
+  //     // @ts-ignore
+  //     formData.append("image1", imageFile, "property_image.jpg");
+
+  //     dispatch(propertyListing(formData))
+  //       .then(() => {
+  //         dispatch(updateIndex(0));
+  //         dispatch(getAllHomeProperties(userData.user_id));
+  //         setIsLoading(false);
+  //         onClose();
+  //       })
+  //       .catch((error) => {
+  //         console.error(
+  //           "Error:",
+  //           error.response ? error.response.data : error.message
+  //         );
+  //       });
+  //   } else {
+  //     setImageValidation(true);
+  //   }
+  // };
+
+  const apiUrl = "https://casaco.com.co/properties/";
+  // const bearerToken =
+  //   "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5NjA4MzMzLCJpYXQiOjE2ODk2MDc0MzMsImp0aSI6ImFlYzhkYzZjMjVkYzRiOWNhZjFkZThlN2Q4MThmNTBiIiwidXNlcl9pZCI6Njd9.nXj5Qds_NHVk2ijvswvxKwx1Yyyu44qKDKMjQY2Q_88";
+
   const onSubmit = (data: Inputs) => {
+    console.log(data, "datata");
     if (exteriorChange && exteriorValue > 2000) {
       setErrorState(true);
       setErrorMessage("Maximum value is 2,000");
@@ -185,35 +247,58 @@ const PropertyListingForm: React.FC<listFormProp> = ({ onClose }) => {
       setIsLoading(true);
       const formData = new FormData();
 
-      formData.append("user_id", String(userData.user_id));
-      formData.append("title", data.title);
+      // formData.append("user_id", String(userData.user_id));
+      formData.append("title", data.address);
       formData.append("description", String(data.description));
       formData.append("beds", String(beds));
       formData.append("baths", String(baths));
       formData.append("types", data.apartment);
       formData.append("property_status", "idle");
       formData.append("price", String(20000));
-      formData.append("city", getCity);
-      formData.append("department", data.department);
       formData.append("location", getCity);
-      formData.append("address", data.address);
       formData.append("feature", "None");
       formData.append("latitude", String(formattedLat));
       formData.append("longitude", String(formattedlng));
       formData.append("exterior_size", String(exteriorValue));
       formData.append("interior_size", String(data.interior));
+      // @ts-ignore
       formData.append("image1", imageFile, "property_image.jpg");
+      // axios
+      //   .post(apiUrl, formData, {
+      //     headers: {
+      //       Authorization: `Bearer ${access}`,
 
-      dispatch(propertyListing(formData)).then(() => {
-        dispatch(updateIndex(0));
-        dispatch(getAllHomeProperties(userData.user_id));
-        setIsLoading(false);
-        onClose();
-      });
-    } else {
-      setImageValidation(true);
+      //       // Authorization: `Bearer ${bearerToken}`,
+      //       "Content-Type": "application/json", // Set the content type of the request body
+      //     },
+      //   })
+      //   .then((response) => {
+      //     // Handle successful response
+      //     console.log("Response:", response.data);
+      //   })
+      //   .catch((error) => {
+      //     // Handle error
+      //     console.error(
+      //       "Error:",
+      //       error.response ? error.response.data : error.message
+      //     );
+      //   });
+      dispatch(propertyListing(formData))
+        .then(() => {
+          dispatch(updateIndex(0));
+          dispatch(getAllHomeProperties(userData.user_id));
+          setIsLoading(false);
+          onClose();
+        })
+        .catch((error) => {
+          console.error(
+            "Error:",
+            error.response ? error.response.data : error.message
+          );
+        });
     }
   };
+
   const onPlaceSelected = (place: any) => {
     const cityValue = place.formatted_address;
     setGetCity(cityValue);
@@ -222,15 +307,6 @@ const PropertyListingForm: React.FC<listFormProp> = ({ onClose }) => {
   return (
     <div className="overflow-auto h-full max-h-[490px] max-w-[400px]">
       <form onSubmit={handleSubmit(onSubmit)} className="px-3 pb-5">
-        <InputField
-          label="Title"
-          name="title"
-          id="title"
-          type="text"
-          register={register}
-          error={errors.title?.message}
-        />
-
         <div className="mt-5">
           <label className="font-semibold text-sm text-gray-600 pb-1 block">
             Location
@@ -244,7 +320,7 @@ const PropertyListingForm: React.FC<listFormProp> = ({ onClose }) => {
 
         <div className="">
           <label className="block mb-1.5 mt-3 ml-2 text-sm font-semibold text-gray-600 ">
-            Address Line 1
+            Address
           </label>
           <input
             type="text"
@@ -261,15 +337,14 @@ const PropertyListingForm: React.FC<listFormProp> = ({ onClose }) => {
         </div>
 
         <InputField
-          label=" Address Line 2"
+          label="Address Line 2"
           name="addressTwo"
           id="addressTwo"
           placeholder="Optional"
-          type="number"
+          type="string"
           register={register}
           error={errors.addressTwo?.message}
         />
-
         <div>
           <label className="block mb-1.5 mt-3 text-sm font-semibold text-gray-600 ">
             Property Details

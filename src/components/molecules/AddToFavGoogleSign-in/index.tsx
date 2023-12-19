@@ -11,10 +11,7 @@ interface googleSignInprop {
   id: number;
   onClose: () => void;
 }
-const GoogleSigninWithoutRedirect: React.FC<googleSignInprop> = ({
-  id,
-  onClose,
-}) => {
+const FavoriteGoogleSignIn: React.FC<googleSignInprop> = ({ id, onClose }) => {
   const dispatch = useDispatch<any>();
   const clientID = import.meta.env.VITE_CLIENT_ID;
 
@@ -27,8 +24,16 @@ const GoogleSigninWithoutRedirect: React.FC<googleSignInprop> = ({
               signWithGoogle({ token: credentialResponse.credential })
             ).then((data: any) => {
               if (data?.payload) {
-                dispatch(getAllProperties()).then(() => {
-                  toast.success("Logged in Sucessfully!");
+                const userID = data?.payload?.user?.user_id;
+                toast.success("Logged in sucessfully!");
+                dispatch(
+                  addToFavorite({
+                    user_id: userID,
+                    property_id: id,
+                  })
+                ).then(() => {
+                  dispatch(getAllProperties());
+                  toast.success("Added to favorites!");
                 });
               } else {
                 return;
@@ -37,7 +42,7 @@ const GoogleSigninWithoutRedirect: React.FC<googleSignInprop> = ({
             onClose();
           }}
           onError={() => {
-            console.log("Login Failed");
+            console.log("Login Failed!");
           }}
         />
       </GoogleOAuthProvider>
@@ -45,4 +50,4 @@ const GoogleSigninWithoutRedirect: React.FC<googleSignInprop> = ({
   );
 };
 
-export default GoogleSigninWithoutRedirect;
+export default FavoriteGoogleSignIn;

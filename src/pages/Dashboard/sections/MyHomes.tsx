@@ -50,6 +50,8 @@ const MyHomes = () => {
             <p>{`${homeProperties[homePropertyIndex]?.beds} beds`}</p>
             <p>{`${homeProperties[homePropertyIndex]?.baths} baths`}</p>
 
+            {/* {homeProperties[homePropertyIndex]?.property_status !==
+              "for_sale" && ( */}
             <Button
               text="Sell your home"
               type="button"
@@ -57,6 +59,7 @@ const MyHomes = () => {
               className="mt-3"
               onClick={handleSellHome}
             />
+            {/* )} */}
           </div>
         </div>
       )}

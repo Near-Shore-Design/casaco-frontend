@@ -1,7 +1,7 @@
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useState, useEffect, useRef } from "react";
 import { debounce } from "lodash";
-import { useRef, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { RootState } from "store";
 import { useAppDispatch, useAppSelector } from "utilities/hooks";
 import { getPropertiesCoordinate } from "utilities/reduxSlices/MapSlice";
@@ -12,7 +12,6 @@ import {
 import img from "assets/images/house-sale.jpg";
 import Button from "components/atoms/Button";
 import { useNavigate } from "react-router-dom";
-import { saleSchema } from "utilities/Schema/saleSchema";
 import Footer from "components/molecules/Footer";
 import StepOne from "./steps/StepOne";
 import StepTwo from "./steps/StepTwo";
@@ -21,6 +20,7 @@ import Modal from "components/molecules/Modal";
 import ProgressBar from "components/molecules/ProgressBar";
 import { PacmanLoader } from "react-spinners";
 import NotAuthenticatedForm from "components/molecules/NotAuthenticatedForm";
+import { saleSchema } from "utilities/Schema/saleSchema";
 
 type Inputs = {
   title: string;
@@ -38,7 +38,9 @@ type Inputs = {
   department: string;
 };
 
-const SellPage = () => {
+const SellPage: React.FC = () => {
+  const navigate = useNavigate();
+
   const [imageFile, setImageFile] = useState<any>([]);
   const [imagePreview, setImageFilePreview] = useState<Array<any>>([]);
   const [sizeError, setSizeError] = useState<boolean>(false);
@@ -59,12 +61,22 @@ const SellPage = () => {
   const [imageValidation, setImageValidation] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [showSellForm, setShowSellForm] = useState(false);
+  const [price, setPrice] = useState("");
+  const [numericPrice, setNumericPrice] = useState<number>(0);
+  const [hasPriceBeenAdded, setHasPriceBeenAdded] = useState<boolean>(false);
+
+  const [locationValue, setLocationValue] = useState<string>("");
+
   const { propertyCoordinate, propertyCoordinateError } = useAppSelector(
     (state: RootState) => state.map
   );
   const { token } = useAppSelector((state: RootState) => state.auth);
-  const imageRef = useRef<HTMLInputElement | null>(null);
+  let imageRef = useRef<HTMLInputElement | null>(null);
   const { userData } = useAppSelector((state: RootState) => state.auth);
+
+  const { removedImageBlob, removedImageIndex } = useAppSelector(
+    (state: RootState) => state.sell
+  );
 
   const formattedLat = propertyCoordinate.lat.toFixed(5);
   const formattedlng = propertyCoordinate.lng.toFixed(5);
@@ -77,13 +89,14 @@ const SellPage = () => {
     formState,
     setValue,
     reset,
+    getValues,
+    watch,
   } = useForm<Inputs>({
     mode: "onChange",
     resolver: yupResolver(saleSchema),
   });
 
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const handleBedChange = (selected: any) => {
     setBathBathErrorState(false);
@@ -102,15 +115,34 @@ const SellPage = () => {
     setFeaturesValue(values);
   };
 
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e?.target?.value;
+    const numericValue = val.replace(/[^0-9]/g, "").replace(",", ".");
+    const formattedValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    const stringWithoutDots = formattedValue.replace(/\./g, "");
+    const numberValue = parseFloat(stringWithoutDots);
+    setPrice(formattedValue);
+    setNumericPrice(numberValue);
+    if (!hasPriceBeenAdded) {
+      setHasPriceBeenAdded(true);
+    }
+  };
+
+  const priceValidationMsg =
+    hasPriceBeenAdded && (numericPrice < 1 || isNaN(numericPrice))
+      ? "Minimum property amount should be 1 Colombian pesos"
+      : numericPrice >= 50000000000 &&
+        "Maximum property amount can be 50.000.000.000 Colombian pesos";
+
   const exteriorInputChange = (e: any) => {
     setErrorState(false);
     const value = e.target.value;
     const sanitizedValue = value.replace(/[-e]/gi, "");
     setExteriorValue(sanitizedValue);
 
-    if (exteriorChange && value < 10) {
+    if (exteriorChange && value < 1) {
       setErrorState(true);
-      setErrorMessage("Value must be more than 10");
+      setErrorMessage("Minimum value should be 1");
     }
     if (exteriorChange && value > 2000) {
       setErrorState(true);
@@ -160,6 +192,7 @@ const SellPage = () => {
       return;
     }
   }, 700);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
     const selectedFiles = Array.from(e.target.files || []); // Convert FileList to an array
@@ -167,6 +200,7 @@ const SellPage = () => {
     const invalidFiles: File[] = [];
     setImageValidation(false);
     setSizeError(false);
+
     selectedFiles.forEach((file) => {
       const fileSizeInBytes = file.size as number;
       if (fileSizeInBytes > maxSizeInBytes) {
@@ -183,17 +217,13 @@ const SellPage = () => {
       setSizeError(true);
     } else {
       setSizeError(false);
-      setImageFile(validFiles);
+      setImageFile((prevImageFiles: any) => [...prevImageFiles, ...validFiles]);
 
       const imagePreviews = validFiles.map((file) => URL.createObjectURL(file));
-      setImageFilePreview(imagePreviews);
-    }
-  };
-  const removeImagePreview = () => {
-    setImageFile([]);
-    setImageFilePreview([]);
-    if (imageRef.current) {
-      imageRef.current.value = "";
+      setImageFilePreview((prevImagePreviews) => [
+        ...prevImagePreviews,
+        ...imagePreviews,
+      ]);
     }
   };
 
@@ -201,41 +231,24 @@ const SellPage = () => {
     if (!token.access_token) {
       return setAuthModalShow(true);
     }
-    const valueString = exteriorValue.toString();
-    const decimalRegex = /^-?\d+(\.\d{5,})$/;
-    const checkForDecimalPlaces = decimalRegex.test(valueString);
-    if (exteriorChange && exteriorValue > 2000) {
-      setErrorState(true);
-      setErrorMessage("Maximum value is 2,000");
-      return;
-    }
-    if (bedsValue === null || bathsValue === null) {
-      setBathBathErrorState(true);
-      setErrorMessage("Bed and bath cannot be empty");
-      return;
-    }
-    if (!exteriorChange && checkForDecimalPlaces) {
-      setErrorState(true);
-      setErrorMessage("Value too large");
-      return;
-    }
 
-    if (imageFile.length > 0) {
+    const numericPrice = parseFloat(price.replace(/\./g, "").replace(",", "."));
+
+    if (imageFile !== "") {
       setIsLoading(true);
+
       const formData = new FormData();
 
       formData.append("user_id", String(userData.user_id));
-      formData.append("title", data.title);
+      formData.append("title", data.address);
       formData.append("description", String(data.description));
       formData.append("beds", String(beds));
       formData.append("property_status", "for_sale");
-      formData.append("price", String(data.price));
-      formData.append("city", getCity);
-      formData.append("department", data.department);
+      formData.append("price", String(numericPrice));
+      formData.append("location", getCity);
       formData.append("baths", String(baths));
       formData.append("types", data.apartment);
       formData.append("location", getCity);
-      formData.append("address", data.address);
       formData.append("feature", featuresValue.join(", "));
       formData.append("latitude", String(formattedLat));
       formData.append("longitude", String(formattedlng));
@@ -243,9 +256,12 @@ const SellPage = () => {
       formData.append("interior_size", String(data.interior));
 
       (imageFile as File[]).forEach((image: File, index: number) => {
-        formData.append(`images1`, image, "Property_sale.png");
+        formData.append(
+          `image` + index,
+          image,
+          "property_sale_img" + index + ".png"
+        );
       });
-
       dispatch(propertyForSale(formData)).then(() => {
         dispatch(getAllHomeProperties(userData.user_id));
         setIsLoading(false);
@@ -261,9 +277,11 @@ const SellPage = () => {
       setImageValidation(true);
     }
   };
+
   const onPlaceSelected = (place: any) => {
     const cityValue = place.formatted_address;
     setGetCity(cityValue);
+    setLocationValue(cityValue); // Update the locationValue state
   };
 
   const handleStepForward = () => {
@@ -272,6 +290,7 @@ const SellPage = () => {
   const handleStepBack = () => {
     setCurrentStep((prev) => prev - 1);
   };
+
   const steps = [
     {
       component: (
@@ -283,6 +302,7 @@ const SellPage = () => {
           control={control}
           getSearchDebounce={getSearchDebounce}
           streetChecker={streetChecker}
+          locationValue={locationValue}
         />
       ),
     },
@@ -306,6 +326,9 @@ const SellPage = () => {
           exteriorInputChange={exteriorInputChange}
           errorState={errorState}
           handleExteriorChange={handleExteriorChange}
+          price={price}
+          handlePriceChange={handlePriceChange}
+          priceValidationMsg={priceValidationMsg}
         />
       ),
     },
@@ -319,12 +342,49 @@ const SellPage = () => {
           imageFile={imageFile}
           sizeError={sizeError}
           imageValidation={imageValidation}
-          removeImagePreview={removeImagePreview}
           imagePreview={imagePreview}
         />
       ),
     },
   ];
+
+  const values = getValues();
+
+  const watchValues = watch();
+
+  const isStepOneBtnEnabled =
+    getCity?.length > 0 &&
+    Object.keys(values)?.length > 0 &&
+    values?.address !== undefined &&
+    values?.address.length > 0 &&
+    values?.description.length > 0;
+
+  const isStepTwoBtnEnabled =
+    price?.length > 0 &&
+    featuresValue?.length > 0 &&
+    beds !== null &&
+    String(beds)?.length > 0 &&
+    baths !== null &&
+    String(baths)?.length > 0 &&
+    String(values?.interior)?.length > 0 &&
+    String(exteriorValue)?.length > 0 &&
+    exteriorValue !== 0 &&
+    values?.apartment !== undefined &&
+    values?.apartment.length > 0 &&
+    Object.keys(errors).length === 0 &&
+    exteriorValue > 0 &&
+    exteriorValue <= 2000;
+
+  useEffect(() => {
+    setImageFilePreview((prevState) =>
+      prevState.filter((item) => item !== removedImageBlob)
+    );
+    // @ts-ignore
+    setImageFile((prevState) =>
+      // @ts-ignore
+      prevState.filter((_, index: number) => index !== removedImageIndex)
+    );
+  }, [removedImageBlob]);
 
   return (
     <div className="mt-24 p-5">
@@ -391,7 +451,7 @@ const SellPage = () => {
                     Back
                   </button>
                 )}
-                {currentStep == 2 && (
+                {currentStep === 2 && (
                   <Button
                     text={
                       isLoading ? (
@@ -402,7 +462,8 @@ const SellPage = () => {
                     }
                     type="submit"
                     className="w-full flex justify-center"
-                    disabled={!formState.isValid || isLoading}
+                    // disabled={!formState.isValid || isLoading}
+                    disabled={false}
                   />
                 )}
                 {currentStep < 2 && (
@@ -411,6 +472,11 @@ const SellPage = () => {
                     type="button"
                     onClick={handleStepForward}
                     className="w-full flex justify-center"
+                    disabled={
+                      currentStep === 0
+                        ? !isStepOneBtnEnabled
+                        : currentStep === 1 && !isStepTwoBtnEnabled
+                    }
                   />
                 )}
               </div>

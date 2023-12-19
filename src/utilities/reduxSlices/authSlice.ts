@@ -85,6 +85,9 @@ export const authSlice = createSlice({
     clearResetParams: (state) => {
       state.params = initialState;
     },
+    // handleLogOut: (state) => {
+    //   persistor?.purge();
+    // },
   },
   extraReducers: (builder) => {
     builder.addCase(userLogin.fulfilled, (state, action) => {
@@ -122,7 +125,6 @@ export const authSlice = createSlice({
 
       state.isLoading = false;
     });
-
     builder.addCase(userDataUpdate.pending, (state) => {
       state.isLoading = true;
     });
@@ -165,7 +167,6 @@ export const authSlice = createSlice({
     builder.addCase(userResetPassword.pending, (state, action) => {
       state.isLoading = true;
     });
-
     builder.addCase(getUidValidation.fulfilled, (state, action) => {
       state.Uiidvalidation = action.payload;
     });

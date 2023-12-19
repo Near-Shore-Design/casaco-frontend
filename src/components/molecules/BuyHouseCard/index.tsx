@@ -11,6 +11,7 @@ import {
   getAllProperties,
   getNotAuthenticatedPropertyId,
   getSingleProperty,
+  getAllFavoriteProperties,
 } from "utilities/reduxSlices/HomePropertySlice";
 import { buyCardProps } from "./types";
 import { RootState } from "store";
@@ -30,13 +31,13 @@ const BuyHouseCard: React.FC<buyCardProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const [showHouse, setShowHouse] = useState<boolean>(false);
-  const [addToFav, setAddToFav] = useState<boolean>(false);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [showShareContent, setShowShareContent] = useState<boolean>(false);
 
   const showPropertyDetail = (id: number) => {
-    dispatch(getSingleProperty(id));
-    setShowHouse(true);
+    dispatch(getSingleProperty(id)).then(() => {
+      setShowHouse(true);
+    });
   };
   const hideForm = () => {
     setShowForm(false);
@@ -48,17 +49,24 @@ const BuyHouseCard: React.FC<buyCardProps> = ({
       user_id: userData.user_id,
       property_id: id,
     };
+    const userID = data?.user_id;
+    const propertyID = data?.property_id;
     if (!token.access_token) {
       setShowForm(true);
       dispatch(getNotAuthenticatedPropertyId(id));
     } else {
       dispatch(addToFavorite(data)).then(() => {
-        dispatch(getAllProperties());
+        let favProperties: any[];
+        dispatch(getAllFavoriteProperties(userID)).then((data: any) => {
+          favProperties = data?.payload;
+          favProperties?.some(
+            (favProperty: any) => favProperty?.property_id === propertyID
+          )
+            ? toast.success("Added to favorites!")
+            : toast.success("Removed from favorites!");
+          dispatch(getAllProperties());
+        });
       });
-      addToFav
-        ? toast.success("Removed from favorite")
-        : toast.success(" Added to favorites");
-      setAddToFav((prev) => !prev);
     }
   };
   const closePropertyDetail = () => {
@@ -138,7 +146,7 @@ const BuyHouseCard: React.FC<buyCardProps> = ({
         className="w-full"
         id={id}
       >
-        <SingleHouseModalComponent />
+        <SingleHouseModalComponent favourites={favourites} />
       </Modal>
 
       <Modal

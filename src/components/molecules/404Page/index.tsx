@@ -9,7 +9,7 @@ const NotFoundPage = () => {
       <h2 className="text-[2rem] font-semibold">404 - PAGE NOT FOUND</h2>
       <p className="text-2xl max-w-[650px] text-center py-4">
         The page you are looking for might have been removed or is temporarily
-        unavailable{" "}
+        unavailable.
       </p>
       <Button text="Back to home" type="button" onClick={() => navigate("/")} />
     </div>

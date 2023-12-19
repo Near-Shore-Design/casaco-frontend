@@ -1,6 +1,5 @@
 import * as yup from "yup";
 export const propertyFormSchema = yup.object().shape({
-  title: yup.string().required("Add property title"),
   address: yup.string().required("Enter Valid location"),
   description: yup.string().required("Add property description"),
   interior: yup

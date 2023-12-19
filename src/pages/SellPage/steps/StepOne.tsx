@@ -11,6 +11,7 @@ interface stepOneProp {
   control: any;
   getSearchDebounce: (x: string) => void;
   streetChecker: boolean;
+  locationValue: string;
 }
 const StepOne: React.FC<stepOneProp> = ({
   register,
@@ -19,24 +20,17 @@ const StepOne: React.FC<stepOneProp> = ({
   errors,
   getSearchDebounce,
   streetChecker,
+  locationValue,
 }) => {
   return (
     <div>
-      <InputField
-        label="Title"
-        name="title"
-        id="title"
-        type="text"
-        register={register}
-        error={errors.title?.message}
-      />
       <div className="w-full mt-5">
         <label className="font-semibold text-sm text-gray-600 pb-1 block">
           Location
         </label>
         <PlaceComponent
-          placeholder="Enter city.."
-          defaultValue=""
+          placeholder="Enter property location..."
+          defaultValue={locationValue}
           placeSelected={onPlaceSelected}
         />
       </div>
@@ -50,6 +44,7 @@ const StepOne: React.FC<stepOneProp> = ({
           disabled={streetChecker}
           onChange={(e) => getSearchDebounce(e.target.value)}
           className="border rounded-lg dark:text-dark outline-none focus:border-violet-blue duration-200 px-3 py-2 mt-1 text-lg w-full"
+          required
         />
         {propertyCoordinateError ? (
           <ErrorMessage field="Enter a valid location" />

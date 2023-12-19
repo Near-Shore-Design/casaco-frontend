@@ -5,7 +5,7 @@ import { RootState } from "store";
 
 const Routing = () => {
   const { token } = useAppSelector((state: RootState) => state.auth);
-  const isAuthenticated = token.access_token;
+  const isAuthenticated = token?.access_token;
 
   function PrivateRoute() {
     return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
